@@ -1,103 +1,118 @@
-const swPrefix = "sw-cms-";
+const swPrefix = "ott-cms-";
 const fs = require('fs');
 const currentDir = process.cwd();
 const fileController = require('./fileController');
 
 class adminTemplateController {
-
-    constructor(type, name) {
-        this.type = type;
-        this.name = name;
+    constructor() {
         this.files = new fileController();
     }
 
-    setType(type){
-        this.type = type;
+    getPluginName() {
+        return this.pluginName;
     }
 
-    setName(name){
-        this.name = name;
+    setPluginName(name) {
+        this.pluginName = name;
     }
 
-    setBlockType(type){
-        this.blockType = type;
+    getCmsType() {
+        return this.cmsType;
     }
 
-    setConfigPath(){
+    setCmsType(type){
+        this.cmsType = type;
+    }
+
+    getCmsName() {
+        return this.cmsName;
+    }
+
+    setCmsName(name){
+        this.cmsName = name;
+    }
+
+    getCmsBlockType() {
+        return this.cmsBlockType;
+    }
+
+    setCmsBlockType(type){
+        this.cmsBlockType = type;
+    }
+
+    setConfigPath() {
         this.composerPath = this.files.getComposerPath(currentDir);
-        if(this.composerPath === currentDir){
-            this.adminDir = currentDir + "/"
-        }else{
-            this.adminDir = this.composerPath + "/src/Resources/app/administration/src/ott-cms/";
-        }
+        this.adminDir = this.composerPath + `/custom/plugins/${this.getPluginName()}/src/Resources/app/administration/src/ott-cms/`;
 
-        if (this.type === "block"){
+        if (this.getCmsType() === "block"){
             this.templateFolder = `${__dirname}/templates/admin/block/`;
 
-            this.previewClass = `${swPrefix}block-preview-${this.name}`;
-            this.previewBlock = `${swPrefix.replace(/-/g, '_')}block_preview_${this.name.replace(/-/g, '_')}`;
+            this.previewClass = `${swPrefix}block-preview-${this.getCmsName()}`;
+            this.previewBlock = `${swPrefix.replace(/-/g, '_')}block_preview_${this.getCmsName().replace(/-/g, '_')}`;
 
-            this.componentClass = `${swPrefix}block-${this.name}`;
-            this.componentBlock = `${swPrefix.replace(/-/g, '_')}block_${this.name.replace(/-/g, '_')}`;
+            this.componentClass = `${swPrefix}block-${this.getCmsName()}`;
+            this.componentBlock = `${swPrefix.replace(/-/g, '_')}block_${this.getCmsName().replace(/-/g, '_')}`;
 
             this.adminDir += "blocks/";
-        }else if (this.type === "element"){
+        }else if (this.getCmsType() === "element"){
             this.templateFolder = `${__dirname}/templates/admin/element/`;
 
-            this.previewClass = `${swPrefix}el-preview-${this.name}`;
-            this.previewBlock = `${swPrefix.replace(/-/g, '_')}element_preview_${this.name.replace(/-/g, '_')}`;
+            this.previewClass = `${swPrefix}el-preview-${this.getCmsName()}`;
+            this.previewBlock = `${swPrefix.replace(/-/g, '_')}element_preview_${this.getCmsName().replace(/-/g, '_')}`;
 
-            this.configClass = `${swPrefix}el-config-${this.name}`;
-            this.configBlock = `${swPrefix.replace(/-/g, '_')}element_config_${this.name.replace(/-/g, '_')}`;
+            this.configClass = `${swPrefix}el-config-${this.getCmsName()}`;
+            this.configBlock = `${swPrefix.replace(/-/g, '_')}element_config_${this.getCmsName().replace(/-/g, '_')}`;
 
-            this.componentClass = `${swPrefix}el-${this.name}`;
-            this.componentBlock = `${swPrefix.replace(/-/g, '_')}element_${this.name.replace(/-/g, '_')}`;
+            this.componentClass = `${swPrefix}el-${this.getCmsName()}`;
+            this.componentBlock = `${swPrefix.replace(/-/g, '_')}element_${this.getCmsName().replace(/-/g, '_')}`;
 
             this.adminDir += "elements/";
-        }else{
+        } else {
             throw "type is not supported!";
         }
-        this.adminDir += this.name + "/";
 
+        this.adminDir += this.getCmsName() + "/";
         this.previewDir = this.adminDir + "preview/";
         this.configDir = this.adminDir + "config/";
         this.componentDir = this.adminDir + "component/";
     }
 
-    createFromTemplates(){
+    createFromTemplates() {
         this.setConfigPath();
         this.files.createDirectory(this.previewDir);
         this.files.createDirectory(this.componentDir);
-        if(this.type === "block"){
+
+        if (this.getCmsType() === "block") {
             this.createBlock();
-        }else if(this.type === "element"){
+        } else if (this.getCmsType() === "element") {
             this.files.createDirectory(this.configDir);
             this.createElement();
         }
+
         this.createMainJs();
     }
 
-    createBlock(){
+    createBlock() {
         this.createComponent();
         this.createPreview();
         this.createIndex();
     }
 
-    createElement(){
+    createElement() {
         this.createConfig();
         this.createComponent();
         this.createPreview();
         this.createIndex();
     }
 
-    createMainJs(){
-        const mainJsPath = this.composerPath + "/src/Resources/app/administration/src/";
-        const mainJsContent = `import './ott-cms/elements/${this.name}'`;
+    createMainJs() {
+        const mainJsPath = this.composerPath + `/custom/plugins/${this.getPluginName()}/src/Resources/app/administration/src/`;
+        const mainJsContent = `import './ott-cms/elements/${this.getCmsName()}'`;
 
         fs.writeFileSync(`${mainJsPath}main.js`, mainJsContent);
     }
 
-    createComponent(){
+    createComponent() {
         let block = fs.readFileSync(`${this.templateFolder}component/component.scss.template`, "utf8");
         block = block.replace(/##class##/g, this.componentClass);
         fs.writeFileSync(`${this.componentDir}${this.componentClass}.scss`, block);
@@ -109,11 +124,11 @@ class adminTemplateController {
 
         block = fs.readFileSync(`${this.templateFolder}component/index.js.template`, "utf8");
         block = block.replace(/##class##/g, this.componentClass);
-        block = block.replace(/##name##/g, this.name);
+        block = block.replace(/##name##/g, this.getCmsName());
         fs.writeFileSync(`${this.componentDir}index.js`, block);
     }
 
-    createConfig(){
+    createConfig() {
         let block = fs.readFileSync(`${this.templateFolder}config/config.scss.template`, "utf8");
         block = block.replace(/##class##/g, this.configClass);
         fs.writeFileSync(`${this.configDir}${this.configClass}.scss`, block);
@@ -125,11 +140,11 @@ class adminTemplateController {
 
         block = fs.readFileSync(`${this.templateFolder}config/index.js.template`, "utf8");
         block = block.replace(/##class##/g, this.configClass);
-        block = block.replace(/##name##/g, this.name);
+        block = block.replace(/##name##/g, this.getCmsName());
         fs.writeFileSync(`${this.configDir}index.js`, block);
     }
 
-    createPreview(){
+    createPreview() {
         let block = fs.readFileSync(`${this.templateFolder}preview/preview.scss.template`, "utf8");
         block = block.replace(/##class##/g, this.previewClass);
         fs.writeFileSync(`${this.previewDir}${this.previewClass}.scss`, block);
@@ -144,14 +159,16 @@ class adminTemplateController {
         fs.writeFileSync(`${this.previewDir}index.js`, block);
     }
 
-    createIndex(){
+    createIndex() {
         let block = fs.readFileSync(`${this.templateFolder}index.js.template`, "utf8");
-        block = block.replace(/##name##/g, this.name);
-        block = block.replace(/##block-type##/g, this.blockType);
+        block = block.replace(/##name##/g, this.getCmsName());
+        block = block.replace(/##block-type##/g, this.getCmsBlockType());
         block = block.replace(/##preview-class##/g, this.previewClass);
-        if(this.configClass){
+        
+        if (this.configClass){
             block = block.replace(/##config-class##/g, this.configClass);
         }
+
         block = block.replace(/##component-class##/g, this.componentClass);
         fs.writeFileSync(`${this.adminDir}index.js`, block);
     }

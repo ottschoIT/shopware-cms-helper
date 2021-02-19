@@ -1,10 +1,17 @@
 'use strict';
 
-const adminTemplateController = require('./adminTemplateController');
-const storefrontTemplateController = require('./storefrontTemplateController');
+const pluginTemplateController = require('./pluginTemplateController');
 const inquirer = require('inquirer');
 
 let questions = [
+    {
+        type: 'input',
+        name: 'plugin-name',
+        message: "Plugin name?",
+        validate: function (input) {
+            return input !== "";
+        }
+    },
     {
         type: 'list',
         name: 'type',
@@ -19,8 +26,8 @@ let questions = [
     },
     {
         type: 'input',
-        name: 'name',
-        message: 'Choose your name:',
+        name: 'cms-name',
+        message: 'CMS (Block / Element) name? (Lowercase with hyphens):',
         validate: function (input) {
             return input !== "";
         }
@@ -29,37 +36,40 @@ let questions = [
 
 const Rx = require('rxjs');
 const prompts = new Rx.Subject();
-const adminTemplate = new adminTemplateController("", "");
-const storefrontTemplate = new storefrontTemplateController("", "");
+const pluginTemplate = new pluginTemplateController();
 
-inquirer.prompt(prompts).ui.process.subscribe(async function(event){
+inquirer.prompt(prompts).ui.process.subscribe(async function(event) {
     let nextQuestion = null;
 
     switch (event.name) {
+        case "plugin-name":
+            pluginTemplate.setPluginName(event.answer);
+            nextQuestion = questions[1];
+            break;
         case "type":
-            adminTemplate.setType(event.answer);
-            storefrontTemplate.setType(event.answer);
-            if (event.answer === "block"){
-                nextQuestion = questions[1];
-            }else{
+            pluginTemplate.setCmsType(event.answer);
+            pluginTemplate.setCmsType(event.answer);
+
+            if (event.answer === "block") {
                 nextQuestion = questions[2];
+            } else {
+                nextQuestion = questions[3];
             }
             break;
         case "block-type":
-            nextQuestion = questions[2];
-            adminTemplate.setBlockType(event.answer);
+            nextQuestion = questions[3];
+            pluginTemplate.setCmsBlockType(event.answer);
             break;
-        case "name":
-            adminTemplate.setName(event.answer);
-            storefrontTemplate.setName(event.answer);
+        case "cms-name":
+            pluginTemplate.setCmsName(event.answer);
+            pluginTemplate.setCmsName(event.answer);
             break;
     }
 
-    if(nextQuestion) {
+    if (nextQuestion) {
         prompts.next(nextQuestion);
-    }else{
-        adminTemplate.createFromTemplates();
-        storefrontTemplate.createFromTemplates();
+    } else {
+        pluginTemplate.createPlugin();
         prompts.complete();
     }
 });

@@ -4,7 +4,7 @@ import './config';
 
 Shopware.Service('cmsService').registerCmsElement({
     name: '##name##',
-    label: 'sw-cms.elements.##name##.label',
+    label: '##name##',
     component: '##component-class##',
     configComponent: '##config-class##',
     previewComponent: '##preview-class##',

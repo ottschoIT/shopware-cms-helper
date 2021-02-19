@@ -3,7 +3,7 @@ import './preview';
 
 Shopware.Service('cmsService').registerCmsBlock({
     name: '##name##',
-    label: 'sw-cms.blocks.commerce.##name##.label',
+    label: 'ott-cms.blocks.commerce.##name##.label',
     category: '##block-type##',
     component: '##component-class##',
     previewComponent: '##preview-class##',
