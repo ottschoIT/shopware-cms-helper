@@ -28,7 +28,7 @@ class adminTemplateController {
         if(this.composerPath === currentDir){
             this.adminDir = currentDir + "/"
         }else{
-            this.adminDir = this.composerPath + "/src/Resources/app/administration/src/sw-cms/";
+            this.adminDir = this.composerPath + "/src/Resources/app/administration/src/ott-cms/";
         }
 
         if (this.type === "block"){
@@ -74,6 +74,7 @@ class adminTemplateController {
             this.files.createDirectory(this.configDir);
             this.createElement();
         }
+        this.createMainJs();
     }
 
     createBlock(){
@@ -87,6 +88,13 @@ class adminTemplateController {
         this.createComponent();
         this.createPreview();
         this.createIndex();
+    }
+
+    createMainJs(){
+        const mainJsPath = this.composerPath + "/src/Resources/app/administration/src/";
+        const mainJsContent = `import './ott-cms/elements/${this.name}'`;
+
+        fs.writeFileSync(`${mainJsPath}main.js`, mainJsContent);
     }
 
     createComponent(){
