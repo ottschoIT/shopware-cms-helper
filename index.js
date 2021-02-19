@@ -27,7 +27,7 @@ let questions = [
     {
         type: 'input',
         name: 'cms-name',
-        message: 'CMS (Block / Element) name? (Lowercase with hyphens):',
+        message: 'CMS Block / Cms Element name?:',
         validate: function (input) {
             return input !== "";
         }
