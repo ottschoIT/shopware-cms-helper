@@ -38,7 +38,7 @@ class storefrontTemplateController {
 
         // Create scss file
         this.files.createDirectory(`${this.appStorefrontDir}src/scss`);
-        fs.writeFileSync(`${this.appStorefrontDir}src/scss/base.scss`, 'test');
+        fs.writeFileSync(`${this.appStorefrontDir}src/scss/base.scss`, '');
 
         // Create template file
         let template = fs.readFileSync(`templates/storefront/storefront.html.twig.template`, "utf8");
