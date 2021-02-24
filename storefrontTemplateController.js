@@ -33,18 +33,24 @@ class storefrontTemplateController {
 
     createFromTemplates() {
         this.composerPath = this.files.getComposerPath(currentDir);
-        this.storefrontDir = this.composerPath + `/custom/plugins/${this.getPluginName()}/src/Resources/views/storefront/`;
+        this.appStorefrontDir = this.composerPath + `/custom/plugins/${this.getPluginName()}/src/Resources/app/storefront/`;
+        this.viewsStorefrontDir = this.composerPath + `/custom/plugins/${this.getPluginName()}/src/Resources/views/storefront/`;
 
+        // Create scss file
+        this.files.createDirectory(`${this.appStorefrontDir}src/scss`);
+        fs.writeFileSync(`${this.appStorefrontDir}src/scss/base.scss`, 'test');
+
+        // Create template file
         let template = fs.readFileSync(`templates/storefront/storefront.html.twig.template`, "utf8");
 
         if (this.getCmsBlockType() === "block") {
-            this.files.createDirectory(`${this.storefrontDir}block`)
+            this.files.createDirectory(`${this.viewsStorefrontDir}block`);
             template = template.replace(/##block-name##/g, this.getCmsName().replace(/-/g, '_'));
-            fs.writeFileSync(`${this.storefrontDir}block/cms-block-${this.getCmsName()}.html.twig`, template);
+            fs.writeFileSync(`${this.viewsStorefrontDir}block/cms-block-${this.getCmsName()}.html.twig`, template);
         } else {
-            this.files.createDirectory(`${this.storefrontDir}element`);
+            this.files.createDirectory(`${this.viewsStorefrontDir}element`);
             template = template.replace(/##block-name##/g, this.getCmsName().replace(/-/g, '_'));
-            fs.writeFileSync(`${this.storefrontDir}element/cms-element-${this.getCmsName()}.html.twig`, template);
+            fs.writeFileSync(`${this.viewsStorefrontDir}element/cms-element-${this.getCmsName()}.html.twig`, template);
         }
     }
 
